@@ -1,0 +1,51 @@
+name: AuthService CI/CD
+
+on:
+  push:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+env:
+  IMAGE_NAME: authservice
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Java
+        uses: actions/setup-java@v4
+        with:
+          distribution: 'temurin'
+          java-version: '21'
+          cache: 'maven'
+
+      - name: Build and push Docker image with Jib
+        run: |
+          SHORT_SHA=${GITHUB_SHA::7}
+          IMAGE_LATEST="${{ secrets.DOCKERHUB_USERNAME }}/${IMAGE_NAME}:latest"
+          cd AuthService
+          mvn compile jib:build -B \
+            -Djib.to.image="${IMAGE_LATEST}" \
+            -Djib.to.tags="${SHORT_SHA}" \
+            -Djib.to.auth.username=${{ secrets.DOCKERHUB_USERNAME }} \
+            -Djib.to.auth.password=${{ secrets.DOCKERHUB_TOKEN }}
+
+      - name: Install kubectl
+        uses: azure/setup-kubectl@v3
+        with:
+          version: 'v1.28.0'
+
+      - name: Configure kubeconfig
+        run: |
+          mkdir -p $HOME/.kube
+          echo "${{ secrets.KUBE_CONFIG }}" | tr -d '\n\r ' | base64 -d > $HOME/.kube/config
+          chmod 600 $HOME/.kube/config
+
+      - name: Restart authservice deployment
+        run: |
+          kubectl --insecure-skip-tls-verify -n default rollout restart deployment/authservice
+          kubectl --insecure-skip-tls-verify -n default rollout status deployment/authservice
