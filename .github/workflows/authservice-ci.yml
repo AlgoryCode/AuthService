@@ -27,7 +27,6 @@ jobs:
         run: |
           SHORT_SHA=${GITHUB_SHA::7}
           IMAGE_LATEST="${{ secrets.DOCKERHUB_USERNAME }}/${IMAGE_NAME}:latest"
-          cd AuthService
           mvn compile jib:build -B \
             -Djib.to.image="${IMAGE_LATEST}" \
             -Djib.to.tags="${SHORT_SHA}" \
