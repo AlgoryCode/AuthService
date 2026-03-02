@@ -1,0 +1,101 @@
+server:
+  port: 8099
+spring:
+  application:
+    name: "AuthService"
+  config:
+    import: "optional:configserver:http://localhost:8071/"
+  cloud:
+    kubernetes:
+      discovery:
+        all-namespaces: true
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+  security:
+    jwt:
+      secret: "404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970"
+      expiration: 60000 # 1 dakika
+      refresh-expiration: 120000 # 7 gün
+      # 7 gün
+
+  devtools:
+    restart:
+      enabled: true
+  datasource:
+    # H2 In-Memory URL'i. 'mem:testdb' veritabanı adıdır.
+    # DB_CLOSE_DELAY=-1: Son bağlantı kapansa bile DB'yi açık tutar (testler için önemli)
+    # DB_CLOSE_ON_EXIT=FALSE: Uygulama kapanırken DB kapanmasın (bazen gerekebilir)
+    url: jdbc:h2:mem:stage_db;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
+    driver-class-name: org.h2.Driver
+    username: sa
+    password:
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    hibernate:
+      # create-drop: Uygulama başlarken tabloları oluştur, kapanırken sil (Tertemiz başlangıç)
+      # update: Mevcut veriyi korumaya çalışır
+      ddl-auto: create-drop
+      show-sql: true # SQL sorgularını loglarda görmek için (Debug amaçlı)
+      properties:
+        hibernate:
+          format_sql: true # SQL loglarını okunaklı formatta yazar
+
+  h2:
+    console:
+      enabled: true
+      path: /h2-console # http://localhost:8077/h2-console adresinden erişilir
+      settings:
+        web-allow-others: true # Docker içinden erişim için gerekebilir
+
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    shutdown:
+      access: unrestricted
+    health:
+      probes:
+        enabled: true
+  health:
+    readiness-state:
+      enabled: true
+    liveness-state:
+      enabled: true
+  info:
+    env:
+      enabled: true
+
+eureka:
+  instance:
+    preferIpAddress: true
+  client:
+    fetchRegistry: true
+    registerWithEureka: true
+    serviceUrl:
+      defaultZone: http://localhost:8070/eureka/
+
+info:
+  app:
+    name: "authservice"
+    description: "Green Project AuthService"
+    version: "1.0.0"
+
+logging:
+  level:
+    org:
+      springframework:
+        security: DEBUG
+
+
+
+app:
+  cookie:
+    domain: "localhost"
+    secure: true
+
+
