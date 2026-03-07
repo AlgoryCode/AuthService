@@ -13,7 +13,7 @@ import java.util.Collections;
 @Service
 public class GoogleService {
 
-    @Value("${app.google.client-id}")
+    @Value("${spring.security.oauth2.client.registration.google.client-id}")
     private String googleClientId;
 
     public Payload verify(String idTokenString) {
