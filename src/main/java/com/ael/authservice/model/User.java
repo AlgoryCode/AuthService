@@ -37,9 +37,11 @@ public class User {
             message = "Kullanıcı adı harf ile başlamalı, 4-15 karakter arasında olmalı ve sadece harf, rakam, _ içermelidir"
     )
     private String username;
+    private String provider;
+    private String providerId;
     @NotNull(message = "Şifre boş geçilemez")
     @NotBlank(message = "Şifre boş olamaz")
-    @Size(min = 6, max = 20, message = "Şifre 6-20 karakter arasında olmalıdır")
+    @Size(min = 6,message = "Şifre 6-20 karakter arasında olmalıdır")
     @Pattern(regexp = "^(?=.*[a-z])(?=.*[A-Z])(?=.*\\d).+$",
             message = "Şifre en az 1 küçük harf, 1 büyük harf ve 1 rakam içermelidir")
     private String password;

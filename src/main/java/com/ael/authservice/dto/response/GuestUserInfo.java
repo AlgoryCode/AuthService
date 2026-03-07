@@ -1,4 +1,4 @@
-package com.ael.authservice.response;
+package com.ael.authservice.dto.response;
 
 
 import lombok.AllArgsConstructor;

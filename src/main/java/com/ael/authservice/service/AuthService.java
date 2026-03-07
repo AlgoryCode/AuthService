@@ -16,16 +16,4 @@ public class AuthService {
     private final ICustomerService customerService;
     private final IAuthRepository authRepository;
 
-    public User createClient(User user) {
-        return customerService.save(user);
-    }
-
-    public Optional<User> getClient(String username, String password) {
-        return Optional.ofNullable(customerService.findByUsernameAndPassword(username, password));
-    }
-
-    public Optional<User> getClientById(Long customerId) {
-        return customerService.findById(customerId);
-    }
-
 }

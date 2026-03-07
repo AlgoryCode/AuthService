@@ -1,9 +1,10 @@
 package com.ael.authservice.util;
 
+import com.ael.authservice.dto.response.UserResponse;
 import com.ael.authservice.model.User;
 import com.ael.authservice.repository.IUserSessionLog;
-import com.ael.authservice.response.AccessTokenResponse;
-import com.ael.authservice.response.RefreshTokenResponse;
+import com.ael.authservice.dto.response.AccessTokenResponse;
+import com.ael.authservice.dto.response.RefreshTokenResponse;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -55,7 +56,7 @@ public class JwtUtil {
         return data;
     }
 
-    public AccessTokenResponse generateAccessToken(User user) {
+    public AccessTokenResponse generateAccessToken(UserResponse user) {
 
         String jti = UUID.randomUUID().toString();
         String sessionId = UUID.randomUUID().toString();
@@ -63,22 +64,22 @@ public class JwtUtil {
         Map<String, Object> claims = new HashMap<>();
         claims.put("jti", jti);
         claims.put("session_id",sessionId);
-        claims.put("role", user.getRoles());
+        //claims.put("role", user.getRoles());
         claims.put("customerId", user.getUserId());
         claims.put("firstName", user.getFirstName());
-        claims.put("lastName", user.getLastName());
+        claims.put("lastName", user.getFamilyName());
         claims.put("tokenType", "ACCESS_TOKEN");
         log.info("Access Token generated successfully.\n");
 
         return AccessTokenResponse.builder()
-                .accessToken(createToken(claims, user.getUsername(),accessExpiration))
+                .accessToken(createToken(claims, user.getFamilyName(),accessExpiration))
                 .jti(jti)
                 .session_id(sessionId)
                 .build();
 
     }
 
-    public RefreshTokenResponse generateRefreshToken(User user, String ati, String sessionId) {
+    public RefreshTokenResponse generateRefreshToken(UserResponse user, String ati, String sessionId) {
         String jti = UUID.randomUUID().toString();
         Map<String, Object> claims = new HashMap<>();
         claims.put("jti", jti);
@@ -87,7 +88,7 @@ public class JwtUtil {
         claims.put("customerId", user.getUserId());
         claims.put("tokenType", "REFRESH_TOKEN");
         log.info("Refresh Token generated successfully.\n");
-        String refreshToken = createToken(claims, user.getUsername(), refreshExpiration);
+        String refreshToken = createToken(claims, user.getFirstName(), refreshExpiration);
 
 
         return RefreshTokenResponse.builder().refreshToken(refreshToken).refreshTokenId(jti).build();
