@@ -111,16 +111,14 @@ public class AuthController {
     }
 
     @PostMapping("/google/login")
-    public ResponseEntity<UserResponse> googleAuth(@RequestBody GoogleLoginRequest request) {
-
-        Payload payload = googleService.verify(request.getIdToken());
-        if (userService.findUserByEmail(payload.getEmail()).isPresent()) {
-            return ResponseEntity.ok(userMapper.toResponse(userMapper.PayloadToUser(payload)));
-        } else {
-            return ResponseEntity.ok(userService.createUser(userMapper.PayloadToUser(payload)));
-        }
+    public ResponseEntity<UserResponse> googleLogin(@RequestBody GoogleLoginRequest request) {
+        return ResponseEntity.ok(userMapper.toResponse(userMapper.PayloadToUser(googleService.verify(request.getIdToken()))));
     }
 
+    @PostMapping("/google/register")
+    public ResponseEntity<UserResponse> googleRegister(@RequestBody GoogleLoginRequest request) {
+        return ResponseEntity.ok(userService.createUser(userMapper.PayloadToUser(googleService.verify(request.getIdToken()))));
+    }
 
     @PostMapping("/revoke-refreshToken")
     public ResponseEntity<String> revokeRefreshToken(@CookieValue String access_token) {
