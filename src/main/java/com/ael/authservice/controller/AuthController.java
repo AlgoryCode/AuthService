@@ -2,6 +2,7 @@ package com.ael.authservice.controller;
 
 import com.ael.authservice.dto.request.GoogleLoginRequest;
 import com.ael.authservice.dto.response.UserResponse;
+import com.ael.authservice.mapper.UserMapper;
 import com.ael.authservice.model.User;
 import com.ael.authservice.model.UserSessionLog;
 import com.ael.authservice.dto.response.AccessTokenResponse;
@@ -13,14 +14,17 @@ import com.ael.authservice.service.UserService;
 import com.ael.authservice.service.UserSessionLogService;
 import com.ael.authservice.util.JwtUtil;
 import com.ael.authservice.model.LoginRequest;
+import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken.Payload;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -34,6 +38,7 @@ public class AuthController {
     private static final Logger log = LoggerFactory.getLogger(AuthController.class);
 
     private final JwtUtil jwtUtil;
+    private final UserMapper userMapper;
     private AuthService authService;
     private final CookieService cookieService;
     private final GoogleService googleService;
@@ -45,13 +50,14 @@ public class AuthController {
     public ResponseEntity<?> login(@RequestBody LoginRequest loginRequest) {
 
 
-        UserResponse user = userService.findUserByEmail(loginRequest.getEmail());
+        UserResponse user = userService.findUserByEmail(loginRequest.getEmail())
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid credentials"));
 
         AccessTokenResponse accessTokenResponse = jwtUtil.generateAccessToken(user);
         RefreshTokenResponse refreshTokenResponse = jwtUtil.generateRefreshToken(user, accessTokenResponse.getJti(), accessTokenResponse.getSession_id());
         String csrfToken = jwtUtil.generateCsrfToken();
 
-        userSessionLogService.createSessionLog( UserSessionLog.builder()
+        userSessionLogService.createSessionLog(UserSessionLog.builder()
                 .refreshTokenId(refreshTokenResponse.getRefreshTokenId())
                 .accessTokenId(accessTokenResponse.getJti())
                 .sessionId(accessTokenResponse.getSession_id())
@@ -105,10 +111,14 @@ public class AuthController {
     }
 
     @PostMapping("/google/login")
-    public ResponseEntity<?> googleAuth(@RequestBody GoogleLoginRequest request){
+    public ResponseEntity<UserResponse> googleAuth(@RequestBody GoogleLoginRequest request) {
 
-        //Payload payload = googleTokenVerifierService.verify(testToke);
-        return  null;
+        Payload payload = googleService.verify(request.getIdToken());
+        if (userService.findUserByEmail(payload.getEmail()).isPresent()) {
+            return ResponseEntity.ok(userMapper.toResponse(userMapper.PayloadToUser(payload)));
+        } else {
+            return ResponseEntity.ok(userService.createUser(userMapper.PayloadToUser(payload)));
+        }
     }
 
 
