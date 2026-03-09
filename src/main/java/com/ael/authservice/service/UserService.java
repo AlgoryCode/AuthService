@@ -29,4 +29,8 @@ public class UserService {
     public Optional<UserResponse> findUserByEmail(String email) {
         return userRepository.findByEmail(email).map(userMapper::toResponse);
     }
+
+    public UserResponse getUserById(Integer userId){
+        return userMapper.toResponse(userRepository.findById(userId).get());
+    }
 }

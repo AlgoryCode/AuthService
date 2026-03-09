@@ -15,6 +15,7 @@ import com.ael.authservice.service.UserSessionLogService;
 import com.ael.authservice.util.JwtUtil;
 import com.ael.authservice.model.LoginRequest;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken.Payload;
+import com.google.api.client.util.DateTime;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
@@ -26,6 +27,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 
@@ -100,19 +102,58 @@ public class AuthController {
     }
 
     @PostMapping("/refreshAccessToken")
-    public ResponseEntity<String> refreshAccessToken(@CookieValue String access_token) {
+    public ResponseEntity<?> refreshAccessToken(@CookieValue String access_token) {
 
         String session_id = jwtUtil.extractSessionIdFromToken(access_token);
         Integer userId = jwtUtil.extractUserIdFromToken(access_token);
+        if (userSessionLogService.getRefreshTokenBySessionId(session_id).isBefore(LocalDateTime.now())) {
+
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Refresh Token Expired");
 
 
-        return null;
+        }
+        UserResponse user = userService.getUserById(userId);
+        AccessTokenResponse accessTokenResponse = jwtUtil.generateAccessToken(user);
+        RefreshTokenResponse refreshTokenResponse = jwtUtil.generateRefreshToken(user, accessTokenResponse.getJti(), accessTokenResponse.getSession_id());
+        String csrfToken = jwtUtil.generateCsrfToken();
 
+
+
+        return ResponseEntity.ok()
+                .header(cookieService.createLoginHeaders(
+                        accessTokenResponse.getAccessToken(),
+                        refreshTokenResponse.getRefreshToken(),
+                        csrfToken).toString()).body(user);
     }
 
     @PostMapping("/google/login")
-    public ResponseEntity<UserResponse> googleLogin(@RequestBody GoogleLoginRequest request) {
-        return ResponseEntity.ok(userMapper.toResponse(userMapper.PayloadToUser(googleService.verify(request.getIdToken()))));
+    public ResponseEntity<?> googleLogin(@RequestBody GoogleLoginRequest request) {
+        UserResponse user = userMapper.toResponse(userMapper.PayloadToUser(googleService.verify(request.getIdToken())));
+        AccessTokenResponse accessTokenResponse = jwtUtil.generateAccessToken(user);
+        RefreshTokenResponse refreshTokenResponse = jwtUtil.generateRefreshToken(user, accessTokenResponse.getJti(), accessTokenResponse.getSession_id());
+        String csrfToken = jwtUtil.generateCsrfToken();
+
+        userSessionLogService.createSessionLog(UserSessionLog.builder()
+                .refreshTokenId(refreshTokenResponse.getRefreshTokenId())
+                .accessTokenId(accessTokenResponse.getJti())
+                .sessionId(accessTokenResponse.getSession_id())
+                .expiryDate(refreshTokenResponse.getExpiryDate())
+                .userAgent("")
+                .build());
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, cookieService
+                        .createAccessTokenCookie(accessTokenResponse.getAccessToken()).toString())
+                .header(HttpHeaders.SET_COOKIE, cookieService
+                        .createRefreshTokenCookie(refreshTokenResponse.getRefreshToken()).toString())
+                .header(HttpHeaders.SET_COOKIE, cookieService
+                        .createCsrfTokenCookie(csrfToken).toString())
+                .body(user);
+//                .headers(cookieService.createLoginHeaders(
+//                        accessTokenResponse.getAccessToken(),
+//                        refreshTokenResponse.getRefreshToken(),
+//                        csrfToken)).body("Succes");
+
     }
 
     @PostMapping("/google/register")

@@ -3,10 +3,13 @@ package com.ael.authservice.service;
 
 import com.ael.authservice.model.UserSessionLog;
 import com.ael.authservice.repository.IUserSessionLog;
+import com.google.api.client.util.DateTime;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.UUID;
 
@@ -81,6 +84,10 @@ public class UserSessionLogService {
         } else {
             return "Unknown Desktop";
         }
+    }
+
+    public LocalDateTime getRefreshTokenBySessionId(String sessionId){
+        return userSession.findBySessionId(sessionId).getExpiryDate();
     }
 
 

@@ -5,6 +5,7 @@ import com.ael.authservice.model.User;
 import com.ael.authservice.repository.IUserSessionLog;
 import com.ael.authservice.dto.response.AccessTokenResponse;
 import com.ael.authservice.dto.response.RefreshTokenResponse;
+import com.google.api.client.util.DateTime;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -16,6 +17,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import java.security.SecureRandom;
+import java.time.Instant;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
 import java.util.Base64;
 import javax.crypto.SecretKey;
 import java.util.Date;
@@ -91,7 +95,11 @@ public class JwtUtil {
         String refreshToken = createToken(claims, user.getFirstName(), refreshExpiration);
 
 
-        return RefreshTokenResponse.builder().refreshToken(refreshToken).refreshTokenId(jti).build();
+        return RefreshTokenResponse.builder()
+                .refreshToken(refreshToken)
+                .refreshTokenId(jti)
+                .expiryDate(LocalDateTime.now().plus(refreshExpiration, ChronoUnit.MILLIS))
+                .build();
     }
 
 
