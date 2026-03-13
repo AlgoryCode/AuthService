@@ -13,6 +13,7 @@ import com.ael.authservice.service.UserService;
 import com.ael.authservice.service.UserSessionLogService;
 import com.ael.authservice.util.JwtUtil;
 import com.ael.authservice.model.LoginRequest;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.Valid;
 import lombok.AllArgsConstructor;
 import org.springframework.cloud.context.config.annotation.RefreshScope;
@@ -104,20 +105,22 @@ public class BasicAuthController {
     }
 
     @PostMapping("/google/login")
-    public ResponseEntity<?> googleLogin(@RequestBody GoogleAuthRequest request) {
+    public ResponseEntity<?> googleLogin(@RequestBody String idToken) {
 
 
-        String csrfToken = jwtUtil.generateCsrfToken();
+        UserResponse user = authService.authenticate(
+                AuthType.GOOGLE,
+                new GoogleAuthRequest(idToken)
+        );
 
-//        userSessionLogService.createSessionLog(UserSessionLog.builder()
-//                .refreshTokenId(refreshTokenResponse.getRefreshTokenId())
-//                .accessTokenId(accessTokenResponse.getJti())
-//                .sessionId(accessTokenResponse.getSession_id())
-//                .expiryDate(refreshTokenResponse.getExpiryDate())
-//                .userAgent("")
-//                .build());
+        String accessToken = jwtUtil.generateAccessToken(user);
+        RefreshTokenResponse refresh = jwtUtil.generateRefreshToken();
 
-        return ResponseEntity.ok().body("");
+        return ResponseEntity.ok(Map.of(
+                "accessToken", accessToken,
+                "refreshToken", refresh.getRefreshToken()
+        ));
+
     }
 
     @PostMapping("/google/register")

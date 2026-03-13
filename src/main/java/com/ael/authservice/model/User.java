@@ -23,6 +23,7 @@ public class User {
     private String phoneNumber;
     private String address;
     private String city;
+    @Column(nullable = true)
     private String username;
     private String provider;
     private String providerId;

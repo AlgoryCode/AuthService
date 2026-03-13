@@ -37,7 +37,7 @@ public class GoogleAuthProvider implements AuthProvider<GoogleAuthRequest> {
 
     @Override
     public UserResponse authenticate(GoogleAuthRequest request) {
-        Payload payload = verify(request.googleAccountToken());
+        Payload payload = verify(request.idToken());
 
         return userService.findUserByEmail(payload.getEmail())
                 .orElseGet(() -> {
