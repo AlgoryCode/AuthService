@@ -1,10 +1,11 @@
 package com.ael.authservice.model;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
 
 @Data
 @Builder
-@NoArgsConstructor
 @AllArgsConstructor
 public class AuthLoginResponse {
     @Builder.Default

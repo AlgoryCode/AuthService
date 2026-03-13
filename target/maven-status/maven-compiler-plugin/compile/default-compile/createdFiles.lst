@@ -5,7 +5,6 @@ com/ael/authservice/service/UserSessionLogService.class
 com/ael/authservice/dto/request/RegisterRequest.class
 com/ael/authservice/dto/request/RegisterRequest$RegisterRequestBuilder.class
 com/ael/authservice/util/PasswordUtil.class
-com/ael/authservice/pipeline/AuthStep.class
 com/ael/authservice/controller/AuthController.class
 com/ael/authservice/AuthServiceApplication.class
 com/ael/authservice/dto/response/AuthResponse$AuthResponseBuilder.class
@@ -42,7 +41,6 @@ com/ael/authservice/dto/response/GuestUserInfo$GuestUserInfoBuilder.class
 com/ael/authservice/dto/response/GuestUserInfo.class
 com/ael/authservice/dto/response/ErrorResponse.class
 com/ael/authservice/model/User$UserBuilder.class
-com/ael/authservice/service/CookieService.class
 com/ael/authservice/model/UserSessionLog.class
 com/ael/authservice/dto/request/AuthContactInfo.class
 com/ael/authservice/dto/response/CustomerResponse.class

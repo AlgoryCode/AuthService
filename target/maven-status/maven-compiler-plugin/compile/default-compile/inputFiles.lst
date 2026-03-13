@@ -22,13 +22,11 @@
 /Users/tarikhamarat/Desktop/AuthService/src/main/java/com/ael/authservice/model/Session.java
 /Users/tarikhamarat/Desktop/AuthService/src/main/java/com/ael/authservice/model/User.java
 /Users/tarikhamarat/Desktop/AuthService/src/main/java/com/ael/authservice/model/UserSessionLog.java
-/Users/tarikhamarat/Desktop/AuthService/src/main/java/com/ael/authservice/pipeline/AuthStep.java
 /Users/tarikhamarat/Desktop/AuthService/src/main/java/com/ael/authservice/repository/IAuthRepository.java
 /Users/tarikhamarat/Desktop/AuthService/src/main/java/com/ael/authservice/repository/ICustomerService.java
 /Users/tarikhamarat/Desktop/AuthService/src/main/java/com/ael/authservice/repository/IUserSessionLog.java
 /Users/tarikhamarat/Desktop/AuthService/src/main/java/com/ael/authservice/repository/UserRepository.java
 /Users/tarikhamarat/Desktop/AuthService/src/main/java/com/ael/authservice/service/AuthService.java
-/Users/tarikhamarat/Desktop/AuthService/src/main/java/com/ael/authservice/service/CookieService.java
 /Users/tarikhamarat/Desktop/AuthService/src/main/java/com/ael/authservice/service/GoogleService.java
 /Users/tarikhamarat/Desktop/AuthService/src/main/java/com/ael/authservice/service/UserService.java
 /Users/tarikhamarat/Desktop/AuthService/src/main/java/com/ael/authservice/service/UserSessionLogService.java

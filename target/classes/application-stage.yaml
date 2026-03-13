@@ -12,15 +12,12 @@ spring:
       secret: "404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970"
       expiration: 60000 # 1 dakika
       refresh-expiration: 120000 # 7 gün
-      # 7 gün
+
 
   devtools:
     restart:
       enabled: true
   datasource:
-    # H2 In-Memory URL'i. 'mem:testdb' veritabanı adıdır.
-    # DB_CLOSE_DELAY=-1: Son bağlantı kapansa bile DB'yi açık tutar (testler için önemli)
-    # DB_CLOSE_ON_EXIT=FALSE: Uygulama kapanırken DB kapanmasın (bazen gerekebilir)
     url: jdbc:h2:mem:stage_db;DB_CLOSE_DELAY=-1;DB_CLOSE_ON_EXIT=FALSE
     driver-class-name: org.h2.Driver
     username: sa
@@ -28,20 +25,18 @@ spring:
   jpa:
     database-platform: org.hibernate.dialect.H2Dialect
     hibernate:
-      # create-drop: Uygulama başlarken tabloları oluştur, kapanırken sil (Tertemiz başlangıç)
-      # update: Mevcut veriyi korumaya çalışır
       ddl-auto: create-drop
-      show-sql: true # SQL sorgularını loglarda görmek için (Debug amaçlı)
+      show-sql: true
       properties:
         hibernate:
-          format_sql: true # SQL loglarını okunaklı formatta yazar
+          format_sql: true
 
   h2:
     console:
       enabled: true
-      path: /h2-console # http://localhost:8077/h2-console adresinden erişilir
+      path: /h2-console
       settings:
-        web-allow-others: true # Docker içinden erişim için gerekebilir
+        web-allow-others: true
 
 
 management:
@@ -83,7 +78,7 @@ app:
   google:
     client-id: 990624623867-o83douun4e0vke2nur5qteo9pr4mmlf8.apps.googleusercontent.com
   cookie:
-    domain: "localhost"
-    secure: true
+
+
 
 

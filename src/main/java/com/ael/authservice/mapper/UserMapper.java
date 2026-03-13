@@ -1,12 +1,8 @@
 package com.ael.authservice.mapper;
 
-
 import com.ael.authservice.model.User;
 import com.ael.authservice.dto.response.UserResponse;
-import lombok.AllArgsConstructor;
-import org.springframework.context.annotation.Bean;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken.Payload;
 
 
@@ -28,12 +24,12 @@ public final class UserMapper {
                 .firstName((String) payload.get("given_name"))
                 .lastName((String) payload.get("given_name"))
                 .provider("google")
-                .providerId(payload.getSubject()) // Google unique user id (sub)
+                .providerId(payload.getSubject())
                 .username(payload.getEmail())
                 .phoneNumber(null)
                 .address(null)
                 .city(null)
-                .password("GOOGLE_AUTH") // normal login'de kullanma; tercihen nullable/ayrı akış
+                .password("GOOGLE_AUTH")
                 .roles("USER")
                 .build();
     }

@@ -84,11 +84,5 @@ logging:
         security: DEBUG
 
 
-app:
-  cookie:
-    domain: localhost
-    secure: false
-
-
 
 

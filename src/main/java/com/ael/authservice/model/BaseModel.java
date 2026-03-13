@@ -1,7 +1,5 @@
 package com.ael.authservice.model;
 
-
-import com.google.api.client.util.DateTime;
 import jakarta.persistence.Column;
 import jakarta.persistence.MappedSuperclass;
 import lombok.AllArgsConstructor;

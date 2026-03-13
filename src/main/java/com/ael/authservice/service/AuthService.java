@@ -1,19 +1,20 @@
 package com.ael.authservice.service;
 
-
-import com.ael.authservice.model.User;
-import com.ael.authservice.repository.IAuthRepository;
-import com.ael.authservice.repository.ICustomerService;
-import lombok.AllArgsConstructor;
+import com.ael.authservice.dto.request.AuthRequest;
+import com.ael.authservice.dto.response.UserResponse;
+import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
-import java.util.Optional;
-
 @Service
-@AllArgsConstructor
+@RequiredArgsConstructor
 public class AuthService {
 
-    private final ICustomerService customerService;
-    private final IAuthRepository authRepository;
+    private final AuthProviderFactory authProviderFactory;
 
+    @SuppressWarnings("unchecked")
+    public <T extends AuthRequest> UserResponse authenticate(AuthType type, T request) {
+        AuthProvider<T> provider =
+                authProviderFactory.get(type, (Class<T>) request.getClass());
+        return provider.authenticate(request);
+    }
 }
