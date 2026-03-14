@@ -2,6 +2,9 @@ package com.ael.authservice.service;
 
 import com.ael.authservice.dto.request.AuthRequest;
 import com.ael.authservice.dto.response.UserResponse;
+import com.ael.authservice.factory.AuthProviderFactory;
+import com.ael.authservice.model.AuthType;
+import com.ael.authservice.provider.AuthProvider;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

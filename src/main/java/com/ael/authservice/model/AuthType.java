@@ -1,4 +1,4 @@
-package com.ael.authservice.service;
+package com.ael.authservice.model;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

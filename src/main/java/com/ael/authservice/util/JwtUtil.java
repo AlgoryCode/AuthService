@@ -1,7 +1,6 @@
 package com.ael.authservice.util;
 
 import com.ael.authservice.dto.response.UserResponse;
-import com.ael.authservice.repository.IUserSessionLog;
 import com.ael.authservice.dto.response.RefreshTokenResponse;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
@@ -31,8 +30,6 @@ public class JwtUtil {
 
     private static final Logger log = LoggerFactory.getLogger(JwtUtil.class);
 
-    private final IUserSessionLog IUserSessionLog;
-
     @Value("${spring.security.jwt.secret}")
     private String secret;
 
@@ -57,7 +54,7 @@ public class JwtUtil {
         return data;
     }
 
-    public String generateAccessToken(UserResponse user) {
+    public String generateAccessToken(UserResponse user,String uuid) {
         String jti = UUID.randomUUID().toString();
         String sessionId = UUID.randomUUID().toString();
 
@@ -65,15 +62,30 @@ public class JwtUtil {
         claims.put("jti", jti);
         claims.put("session_id",sessionId);
         //claims.put("role", user.getRoles());
-        claims.put("customerId", user.getUserId());
+        claims.put("userId", user.getUserId());
         claims.put("firstName", user.getFirstName());
         claims.put("lastName", user.getFamilyName());
         claims.put("tokenType", "ACCESS_TOKEN");
         return createAccessToken(claims, user.getUserId().toString());
-
     }
 
-    public RefreshTokenResponse generateRefreshToken() {
+    public RefreshTokenResponse generateRefreshToken(String uuid) {
+        String jti = UUID.randomUUID().toString();
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("jti", jti);
+        claims.put("type", "REFRESH_TOKEN");
+        log.info("Refresh Token generated successfully.\n");
+        String refreshToken = createRefreshToken(claims);
+
+
+        return RefreshTokenResponse.builder()
+                .refreshToken(refreshToken)
+                .refreshTokenId(jti)
+                .expiryDate(LocalDateTime.now().plus(refreshExpiration, ChronoUnit.MILLIS))
+                .build();
+    }
+
+    public RefreshTokenResponse generateRefreshToken(String uuid,Date date) {
         String jti = UUID.randomUUID().toString();
         Map<String, Object> claims = new HashMap<>();
         claims.put("jti", jti);
@@ -128,8 +140,8 @@ public class JwtUtil {
         return extractClaim(token, claims -> claims.get("role", String.class));
     }
 
-    public Integer extractCustomerId(String token) {
-        return extractClaim(token, claims -> claims.get("customerId", Integer.class));
+    public Integer extractUserId(String token) {
+        return extractClaim(token, claims -> claims.get("userId", Integer.class));
     }
 
     public String extractUUID(String token) {
@@ -165,21 +177,6 @@ public class JwtUtil {
                     .get("session_id", String.class);
         } catch (Exception e) {
             log.error("Failed to extract session_id from expired token: {}", e.getMessage());
-            return null;
-        }
-    }
-
-    public Integer extractUserIdFromToken(String token) {
-        try {
-            return Jwts.parserBuilder()
-                    .setSigningKey(getSigningKey())
-                    .setAllowedClockSkewSeconds(86400) // 24 saat tolerans
-                    .build()
-                    .parseClaimsJws(token)
-                    .getBody()
-                    .get("customerId", Integer.class);
-        } catch (Exception e) {
-            log.error("Failed to extract customerId from expired token: {}", e.getMessage());
             return null;
         }
     }

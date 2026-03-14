@@ -1,6 +1,8 @@
-package com.ael.authservice.service;
+package com.ael.authservice.factory;
 
 import com.ael.authservice.dto.request.AuthRequest;
+import com.ael.authservice.provider.AuthProvider;
+import com.ael.authservice.model.AuthType;
 import org.springframework.stereotype.Component;
 
 import java.util.EnumMap;

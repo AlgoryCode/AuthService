@@ -3,8 +3,10 @@ package com.ael.authservice.model;
 import jakarta.persistence.Column;
 import jakarta.persistence.MappedSuperclass;
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
 
@@ -14,6 +16,7 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @NoArgsConstructor
 @MappedSuperclass
+@SuperBuilder
 public class BaseModel {
 
     @CreationTimestamp
@@ -39,9 +42,6 @@ public class BaseModel {
 
     @Column
     private String userAgent;
-
-    @Column(name = "is_revoked")
-    private boolean revoked = false;
 
     private String appName;
 

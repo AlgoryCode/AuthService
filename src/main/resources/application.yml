@@ -16,14 +16,10 @@ spring:
             client-secret: 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
             scope:
               - email , profile , openid
-
-
-
     jwt:
       secret: "404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970"
-      expiration: 60000 # 1 dakika
-      refresh-expiration: 120000 # 7 gün
-      # 7 gün
+      expiration: 300000 # 5 dakika
+      refresh-expiration: 2592000000 # 7 gün
 
   devtools:
     restart:

@@ -1,9 +1,11 @@
-package com.ael.authservice.service;
+package com.ael.authservice.provider;
 
 import com.ael.authservice.dto.request.GoogleAuthRequest;
 import com.ael.authservice.dto.response.UserResponse;
 import com.ael.authservice.mapper.UserMapper;
+import com.ael.authservice.model.AuthType;
 import com.ael.authservice.model.User;
+import com.ael.authservice.service.UserService;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken.Payload;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;

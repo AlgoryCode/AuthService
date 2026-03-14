@@ -1,8 +1,9 @@
-package com.ael.authservice.service;
+package com.ael.authservice.provider;
 
 import com.ael.authservice.dto.request.BasicAuthRequest;
 import com.ael.authservice.dto.response.UserResponse;
 import com.ael.authservice.mapper.UserMapper;
+import com.ael.authservice.model.AuthType;
 import com.ael.authservice.model.User;
 import com.ael.authservice.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -35,6 +36,11 @@ public class BasicAuthProvider implements AuthProvider<BasicAuthRequest> {
         if (!passwordEncoder.matches(request.password(), user.getPassword())) {
             throw new RuntimeException("Invalid credentials");
         }
+
+
+
+
+
 
         return userMapper.toResponse(user);
     }

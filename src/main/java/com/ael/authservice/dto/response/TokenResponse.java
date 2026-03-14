@@ -1,4 +1,4 @@
-package com.ael.authservice.model;
+package com.ael.authservice.dto.response;
 
 
 import lombok.AllArgsConstructor;
@@ -6,9 +6,9 @@ import lombok.Builder;
 import lombok.Data;
 
 @Data
-@Builder
 @AllArgsConstructor
-public class AccessToken {
+@Builder
+public class TokenResponse {
     private String accessToken;
-    private String jti;
+    private String refreshToken;
 }

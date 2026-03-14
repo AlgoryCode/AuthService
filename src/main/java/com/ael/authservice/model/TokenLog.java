@@ -6,16 +6,17 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
 import java.time.LocalDateTime;
 
-@Table(name="user_sessions_logs")
+@Table(name="token_logs")
 @Entity
 @Data
-@Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class UserSessionLog extends BaseModel {
+@SuperBuilder
+public class TokenLog extends BaseModel {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -23,7 +24,6 @@ public class UserSessionLog extends BaseModel {
 
     @Column(nullable = false, unique = true, columnDefinition = "LONGTEXT")
     private String sessionId;
-
 
     @Column
     private LocalDateTime expiryDate;
@@ -34,29 +34,12 @@ public class UserSessionLog extends BaseModel {
     @Column(nullable = false, unique = true, columnDefinition = "LONGTEXT")
     private String refreshTokenId;
 
-    @Column(nullable = false, unique = true, columnDefinition = "LONGTEXT")
-    private String accessTokenId;
-
     private String proccessStatus;
 
-    @Column
+    @Column(name = "is_revoked")
+    private boolean revoked = false;
+
     private LocalDateTime revokedAt;
 
     private LocalDateTime refreshedAt;
-
-    private LocalDateTime expiredAt;
-
-
-
-
-    // Bu satırı geri ekleyin
-
-
-
-
-
-
-
-
-
 }

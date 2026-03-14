@@ -1,4 +1,6 @@
 package com.ael.authservice.dto.request;
 
-public record BasicAuthRequest(String email,String password) implements AuthRequest {
+import javax.annotation.Nullable;
+
+public record BasicAuthRequest(String email, String password) implements AuthRequest {
 }
