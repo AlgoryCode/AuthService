@@ -25,8 +25,8 @@ import java.util.UUID;
 public class TokenService {
     private final JwtUtil jwtUtil;
     private final UserMapper userMapper;
-    private TokenLogRepository tokenLogRepository;
-    private UserRepository userRepository;
+    private final TokenLogRepository tokenLogRepository;
+    private final UserRepository userRepository;
 
     public TokenResponse generateToken(UserResponse user) {
         String uuid = UUID.randomUUID().toString();
