@@ -86,7 +86,7 @@ public class BasicAuthController {
 
     @PostMapping("/revoke-refreshtoken")
     public ResponseEntity<String> revokeRefreshToken(@CookieValue String refresh_token) {
-        String uuid = jwtUtil.extractSessionIdFromToken(refresh_token);
+        tokenService.revokeToken(refresh_token);
         return ResponseEntity.ok("Refresh token revoked");
     }
 
