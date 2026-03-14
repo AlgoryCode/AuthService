@@ -34,14 +34,16 @@ public class TokenService {
         String accessToken = jwtUtil.generateAccessToken(user, uuid);
         RefreshTokenResponse refreshToken = jwtUtil.generateRefreshToken(uuid);
 
-        TokenLog.builder()
+
+
+        tokenLogRepository.save( TokenLog.builder()
                 .userId(user.getUserId())
                 .sessionId(uuid)
                 .expiryDate(refreshToken.getExpiryDate())
                 .userAgent("")
                 .refreshTokenId(refreshToken.getRefreshTokenId())
                 .proccessStatus("")
-                .build();
+                .build());
 
         return TokenResponse.builder()
                 .accessToken(accessToken)
