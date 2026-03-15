@@ -74,6 +74,7 @@ public class JwtUtil {
         Map<String, Object> claims = new HashMap<>();
         claims.put("jti", jti);
         claims.put("type", "REFRESH_TOKEN");
+        claims.put("session_id",uuid);
         log.info("Refresh Token generated successfully.\n");
         String refreshToken = createRefreshToken(claims);
 
