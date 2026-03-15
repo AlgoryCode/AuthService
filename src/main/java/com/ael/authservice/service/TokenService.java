@@ -61,21 +61,21 @@ public class TokenService {
         tokenLogRepository.save(tokenLog);
     }
 
-    public TokenResponse refreshToken(String reToken) {
+    public ResponseEntity<?> refreshToken(String reToken) {
 
-        Integer userId = jwtUtil.extractUserId(reToken);
-        TokenLog tokenLog = tokenLogRepository.findTokenLogByUserId(userId);
+        String sessionId = jwtUtil.extractSessionIdFromToken(reToken);
+        TokenLog tokenLog = tokenLogRepository.findBySessionId(sessionId);
 
-        if (tokenLog.getExpiryDate().isBefore(LocalDateTime.now())){
+        if (tokenLog.getExpiryDate().isBefore(LocalDateTime.now()) || tokenLog.isRevoked()){
             if(!tokenLog.isRevoked()){
                 tokenLog.setRevoked(true);
                 tokenLog.setRevokedAt(LocalDateTime.now());
                 tokenLogRepository.save(tokenLog);
             }
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Refresh token expired");
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Refresh token expired");
         }
 
-        User user = userRepository.findById(userId)
+        User user = userRepository.findById(tokenLog.getUserId())
                 .orElseThrow(() -> new RuntimeException("Invalid credentials"));
 
         String uuid = UUID.randomUUID().toString();
@@ -83,10 +83,16 @@ public class TokenService {
         String accessToken = jwtUtil.generateAccessToken(userMapper.toResponse(user), uuid);
         RefreshTokenResponse refreshToken = jwtUtil.generateRefreshToken(uuid);
 
-        return TokenResponse.builder()
+        tokenLog.setSessionId(uuid);
+        tokenLog.setRefreshedAt(LocalDateTime.now());
+        tokenLog.setExpiryDate(refreshToken.getExpiryDate());
+
+        tokenLogRepository.save(tokenLog);
+
+        return ResponseEntity.ok().body(TokenResponse.builder()
                 .accessToken(accessToken)
                 .refreshToken(refreshToken.getRefreshToken())
-                .build();
+                .build());
     }
 
 }

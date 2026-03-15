@@ -64,8 +64,8 @@ public class BasicAuthController {
     }
 
     @PostMapping("/refreshToken")
-    public ResponseEntity<TokenResponse> refreshAccessToken(@CookieValue String refreshToken) {
-        return ResponseEntity.ok().body(tokenService.refreshToken(refreshToken));
+    public ResponseEntity<?> refreshAccessToken(@CookieValue String refreshToken) {
+        return tokenService.refreshToken(refreshToken);
     }
 
     @PostMapping("/google/login")
