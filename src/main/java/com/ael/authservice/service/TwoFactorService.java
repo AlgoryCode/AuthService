@@ -1,5 +1,6 @@
 package com.ael.authservice.service;
 
+import com.ael.authservice.dto.response.TwoFactorSetupResponse;
 import com.ael.authservice.model.User;
 import com.ael.authservice.repository.UserRepository;
 import dev.samstevens.totp.code.CodeGenerator;
@@ -20,6 +21,10 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.net.URLEncoder;
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
+
 @Service
 @RequiredArgsConstructor
 public class TwoFactorService {
@@ -34,8 +39,9 @@ public class TwoFactorService {
     private final CodeGenerator codeGenerator = new DefaultCodeGenerator(HashingAlgorithm.SHA1, 6);
     private final CodeVerifier codeVerifier = new DefaultCodeVerifier(codeGenerator, timeProvider);
 
-    @Transactional
-    public byte[] prepareSecretAndQrPng(Integer userId) {
+    private record PreparedTotpSetup(byte[] qrPng, String secret, String accountLabel) {}
+
+    private PreparedTotpSetup prepareTotpSetupForUser(Integer userId) {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
 
@@ -58,10 +64,40 @@ public class TwoFactorService {
                 .build();
 
         try {
-            return qrGenerator.generate(qrData);
+            byte[] png = qrGenerator.generate(qrData);
+            return new PreparedTotpSetup(png, secret, user.getEmail());
         } catch (Exception e) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "Failed to generate QR code", e);
         }
+    }
+
+    private static String pctEncode(String s) {
+        return URLEncoder.encode(s, StandardCharsets.UTF_8).replace("+", "%20");
+    }
+
+    /** Google Authenticator key-uri formatı (QR ile aynı yük). */
+    private static String buildOtpAuthUri(String secret, String accountLabel, String issuer) {
+        String label = issuer + ":" + accountLabel;
+        return "otpauth://totp/" + pctEncode(label)
+                + "?secret=" + secret
+                + "&issuer=" + pctEncode(issuer)
+                + "&algorithm=SHA1&digits=6&period=30";
+    }
+
+    @Transactional
+    public byte[] prepareSecretAndQrPng(Integer userId) {
+        return prepareTotpSetupForUser(userId).qrPng();
+    }
+
+    /**
+     * PNG (Base64), gizli anahtar ve otpauth URI — tek telefonda manuel kurulum / uygulama bağlantısı için.
+     */
+    @Transactional
+    public TwoFactorSetupResponse prepareSecretAndSetupPayload(Integer userId) {
+        PreparedTotpSetup p = prepareTotpSetupForUser(userId);
+        String b64 = Base64.getEncoder().encodeToString(p.qrPng());
+        String uri = buildOtpAuthUri(p.secret(), p.accountLabel(), TOTP_ISSUER);
+        return new TwoFactorSetupResponse(p.secret(), TOTP_ISSUER, p.accountLabel(), b64, uri);
     }
 
     @Transactional
@@ -75,7 +111,7 @@ public class TwoFactorService {
 
         String secret = user.getTotpSecret();
         if (secret == null || secret.isBlank()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Run /2fa/enabled first to get a QR code");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Run /2fa/setup or /2fa/enabled first");
         }
 
         String code = rawCode == null ? "" : rawCode.replaceAll("\\s+", "");

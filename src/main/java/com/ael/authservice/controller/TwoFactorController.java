@@ -1,6 +1,7 @@
 package com.ael.authservice.controller;
 
 import com.ael.authservice.dto.request.TotpCodeRequest;
+import com.ael.authservice.dto.response.TwoFactorSetupResponse;
 import com.ael.authservice.service.TwoFactorService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -24,6 +25,13 @@ public class TwoFactorController {
         Integer userId = Integer.parseInt(userIdHeader.trim());
         byte[] png = twoFactorService.prepareSecretAndQrPng(userId);
         return ResponseEntity.ok().contentType(MediaType.IMAGE_PNG).body(png);
+    }
+
+    /** Kurulum: QR görüntüsü (Base64), gizli anahtar, otpauth URI (tek cihaz / manuel giriş). */
+    @PostMapping(value = "/setup", produces = MediaType.APPLICATION_JSON_VALUE)
+    public TwoFactorSetupResponse setupTotp(@RequestHeader("X-User-Id") String userIdHeader) {
+        Integer userId = Integer.parseInt(userIdHeader.trim());
+        return twoFactorService.prepareSecretAndSetupPayload(userId);
     }
 
     @PostMapping("/active")
