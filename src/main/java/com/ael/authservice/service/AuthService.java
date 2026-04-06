@@ -16,6 +16,7 @@ public class AuthService {
 
     @SuppressWarnings("unchecked")
     public <T extends AuthRequest> UserResponse authenticate(AuthType type, T request) {
+
         AuthProvider<T> provider =
                 authProviderFactory.get(type, (Class<T>) request.getClass());
         return provider.authenticate(request);

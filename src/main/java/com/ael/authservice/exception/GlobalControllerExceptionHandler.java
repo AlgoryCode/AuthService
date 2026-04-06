@@ -9,6 +9,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 import org.springframework.web.bind.MethodArgumentNotValidException;
+import org.springframework.web.server.ResponseStatusException;
 import org.springframework.validation.FieldError;
 
 import java.net.URI;
@@ -53,7 +54,27 @@ public class GlobalControllerExceptionHandler extends RuntimeException {
         return problemDetail;
     }
 
-    @ExceptionHandler(Exception.class)  // ✅ Tüm exception'ları yakalar
+    /**
+     * ResponseStatusException'ı gerçek HTTP koduyla döndürür.
+     * Aksi halde {@link #handleGenericException} yakalayıp 500 yapıyordu (örn. yanlış TOTP → 401 yerine 500).
+     */
+    @ExceptionHandler(ResponseStatusException.class)
+    public ResponseEntity<ErrorResponse> handleResponseStatus(ResponseStatusException ex) {
+        int statusCode = ex.getStatusCode().value();
+        HttpStatus resolved = HttpStatus.resolve(statusCode);
+        String reason = ex.getReason() != null
+                ? ex.getReason()
+                : (resolved != null ? resolved.getReasonPhrase() : "Error");
+        log.warn("ResponseStatus {} : {}", statusCode, reason);
+        ErrorResponse errorResponse = new ErrorResponse(
+                ex.getClass().getSimpleName(),
+                System.currentTimeMillis(),
+                Collections.singletonList(reason),
+                Collections.emptyMap());
+        return ResponseEntity.status(statusCode).body(errorResponse);
+    }
+
+    @ExceptionHandler(Exception.class)  // Diğer beklenmeyen hatalar
     public ResponseEntity<ErrorResponse> handleGenericException(Exception exception) {
         log.error("Exception occurred: {}", exception.getMessage(), exception);
         ErrorResponse errorResponse = new ErrorResponse(

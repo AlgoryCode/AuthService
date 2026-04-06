@@ -11,4 +11,10 @@ import lombok.Data;
 public class TokenResponse {
     private String accessToken;
     private String refreshToken;
+
+    /** İstemcinin localStorage kullanıcı özetini doldurması için (JWT içinde e-posta yok). */
+    private Integer userId;
+    private String email;
+    private String firstName;
+    private String lastName;
 }

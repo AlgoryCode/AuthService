@@ -15,6 +15,7 @@ public final class UserMapper {
                 .firstName(user.getFirstName())
                 .familyName(user.getLastName())
                 .phoneNumber(user.getPhoneNumber())
+                .isTwoFactorEnabled(user.isTwoFactorEnabled())
                 .build();
     }
 

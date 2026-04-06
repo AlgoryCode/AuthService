@@ -68,22 +68,6 @@ public class BasicAuthController {
         return tokenService.refreshToken(refreshToken);
     }
 
-    @PostMapping("/google/login")
-    public ResponseEntity<?> googleLogin(@RequestBody String idToken) {
-
-        UserResponse user = authService.authenticate(
-                AuthType.GOOGLE,
-                new GoogleAuthRequest(idToken)
-        );
-        return ResponseEntity.ok(tokenService.generateToken(user));
-
-    }
-
-    @PostMapping("/google/register")
-    public ResponseEntity<?> googleRegister(@RequestBody GoogleAuthRequest request) {
-        return ResponseEntity.ok("");
-    }
-
     @PostMapping("/revoke-refreshtoken")
     public ResponseEntity<String> revokeRefreshToken(@CookieValue String refresh_token) {
         tokenService.revokeToken(refresh_token);

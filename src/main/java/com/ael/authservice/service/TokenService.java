@@ -48,6 +48,10 @@ public class TokenService {
         return TokenResponse.builder()
                 .accessToken(accessToken)
                 .refreshToken(refreshToken.getRefreshToken())
+                .userId(user.getUserId())
+                .email(user.getEmail())
+                .firstName(user.getFirstName())
+                .lastName(user.getFamilyName())
                 .build();
     }
 
@@ -89,9 +93,14 @@ public class TokenService {
 
         tokenLogRepository.save(tokenLog);
 
+        UserResponse refreshedUser = userMapper.toResponse(user);
         return ResponseEntity.ok().body(TokenResponse.builder()
                 .accessToken(accessToken)
                 .refreshToken(refreshToken.getRefreshToken())
+                .userId(refreshedUser.getUserId())
+                .email(refreshedUser.getEmail())
+                .firstName(refreshedUser.getFirstName())
+                .lastName(refreshedUser.getFamilyName())
                 .build());
     }
 

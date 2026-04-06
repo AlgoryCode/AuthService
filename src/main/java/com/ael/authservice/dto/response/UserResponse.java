@@ -11,4 +11,6 @@ public class UserResponse {
     private String familyName;
     private String email;
     private String phoneNumber;
+    private boolean isTwoFactorEnabled;
+
 }

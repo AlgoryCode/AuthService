@@ -1,0 +1,38 @@
+package com.ael.authservice.controller;
+
+import com.ael.authservice.dto.request.GoogleAuthRequest;
+import com.ael.authservice.dto.response.UserResponse;
+import com.ael.authservice.model.AuthType;
+import com.ael.authservice.service.AuthService;
+import com.ael.authservice.service.TokenService;
+import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+@RequestMapping("/google-auth")
+@RequiredArgsConstructor
+public class GoogleAuthController {
+
+    private final AuthService authService;
+    private final TokenService tokenService;
+
+    @PostMapping("/login")
+    public ResponseEntity<?> googleLogin(@RequestBody String idToken) {
+
+        UserResponse user = authService.authenticate(
+                AuthType.GOOGLE,
+                new GoogleAuthRequest(idToken)
+        );
+        return ResponseEntity.ok(tokenService.generateToken(user));
+
+    }
+
+    @PostMapping("/register")
+    public ResponseEntity<?> googleRegister(@RequestBody GoogleAuthRequest request) {
+        return ResponseEntity.ok("");
+    }
+}
