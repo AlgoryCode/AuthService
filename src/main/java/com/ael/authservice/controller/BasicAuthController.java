@@ -47,6 +47,18 @@ public class BasicAuthController {
                 new BasicAuthRequest(req.getEmail(), req.getPassword())
         );
 
+        if (user.isTwoFactorEnabled()) {
+            String pending = jwtUtil.generatePendingTwoFactorToken(user.getUserId());
+            return ResponseEntity.ok(TokenResponse.builder()
+                    .requiresTwoFactor(true)
+                    .twoFactorToken(pending)
+                    .userId(user.getUserId())
+                    .email(user.getEmail())
+                    .firstName(user.getFirstName())
+                    .lastName(user.getFamilyName())
+                    .build());
+        }
+
         return ResponseEntity.ok(tokenService.generateToken(user));
     }
 

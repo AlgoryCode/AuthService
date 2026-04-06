@@ -17,4 +17,11 @@ public class TokenResponse {
     private String email;
     private String firstName;
     private String lastName;
+
+    /** true ise access/refresh yok; twoFactorToken ile sonraki adımda TOTP doğrulanır. */
+    @Builder.Default
+    private boolean requiresTwoFactor = false;
+
+    /** Sadece requiresTwoFactor true iken; POST /2fa/login/verify için Bearer. */
+    private String twoFactorToken;
 }

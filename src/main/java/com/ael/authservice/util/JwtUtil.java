@@ -11,7 +11,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
+import org.springframework.web.server.ResponseStatusException;
 import java.security.SecureRandom;
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -38,6 +40,9 @@ public class JwtUtil {
 
     @Value("${spring.security.jwt.refresh-expiration}")
     private Long refreshExpiration;
+
+    @Value("${spring.security.jwt.two-factor-pending-expiration:300000}")
+    private Long twoFactorPendingExpiration;
 
     private SecretKey getSigningKey() {
         // Convert hex string to byte array
@@ -67,6 +72,38 @@ public class JwtUtil {
         claims.put("lastName", user.getFamilyName());
         claims.put("tokenType", "ACCESS_TOKEN");
         return createAccessToken(claims, user.getUserId().toString());
+    }
+
+    /**
+     * Şifre / Google doğrulandıktan sonra 2FA beklerken verilen kısa ömürlü JWT.
+     * Sadece {@code POST /2fa/login/verify} ile kullanılmalıdır.
+     */
+    public String generatePendingTwoFactorToken(Integer userId) {
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("jti", UUID.randomUUID().toString());
+        claims.put("userId", userId);
+        claims.put("tokenType", "PENDING_2FA");
+        return Jwts.builder()
+                .setClaims(claims)
+                .setSubject(userId.toString())
+                .setIssuedAt(new Date(System.currentTimeMillis()))
+                .setExpiration(new Date(System.currentTimeMillis() + twoFactorPendingExpiration))
+                .signWith(getSigningKey(), SignatureAlgorithm.HS256)
+                .compact();
+    }
+
+    public void assertPendingTwoFactorToken(String token) {
+        try {
+            Claims claims = extractAllClaims(token);
+            Object type = claims.get("tokenType");
+            if (!"PENDING_2FA".equals(type)) {
+                throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid token type");
+            }
+        } catch (ResponseStatusException e) {
+            throw e;
+        } catch (Exception e) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid or expired token");
+        }
     }
 
     public RefreshTokenResponse generateRefreshToken(String uuid) {

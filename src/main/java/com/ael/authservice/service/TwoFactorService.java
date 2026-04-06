@@ -100,6 +100,31 @@ public class TwoFactorService {
         return new TwoFactorSetupResponse(p.secret(), TOTP_ISSUER, p.accountLabel(), b64, uri);
     }
 
+    /** Giriş akışı: şifre/Google sonrası verilen PENDING_2FA JWT ile TOTP doğrulama. */
+    @Transactional(readOnly = true)
+    public void verifyTotpForPendingLogin(Integer userId, String rawCode) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
+
+        if (!user.isTwoFactorEnabled()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "2FA is not enabled for this account");
+        }
+
+        String secret = user.getTotpSecret();
+        if (secret == null || secret.isBlank()) {
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "TOTP not configured");
+        }
+
+        String code = rawCode == null ? "" : rawCode.replaceAll("\\s+", "");
+        if (!code.matches("\\d{6}")) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Invalid code format");
+        }
+
+        if (!codeVerifier.isValidCode(secret, code)) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Invalid verification code");
+        }
+    }
+
     @Transactional
     public void activateWithTotp(Integer userId, String rawCode) {
         User user = userRepository.findById(userId)
