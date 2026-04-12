@@ -1,0 +1,5 @@
+# Tarayıcıdan doğrudan AuthService (ör. Next http://localhost:3000 → http://localhost:8099), gateway yok.
+# Çalıştırma: SPRING_PROFILES_ACTIVE=local
+authservice:
+  cors:
+    enabled: true

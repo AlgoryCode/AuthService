@@ -75,6 +75,12 @@ eureka:
     serviceUrl:
       defaultZone: http://localhost:8070/eureka/
 
+# Gateway zaten CORS ekler; true iken çift Access-Control-Allow-Origin riski. Yerelde tarayıcı→8099 için
+# SPRING_PROFILES_ACTIVE=local (application-local.yml cors açar) veya burada true yapın.
+authservice:
+  cors:
+    enabled: false
+
 info:
   app:
     name: "authservice"
