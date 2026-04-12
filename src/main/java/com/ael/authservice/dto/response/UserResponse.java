@@ -1,5 +1,6 @@
 package com.ael.authservice.dto.response;
 
+import java.util.List;
 import lombok.Builder;
 import lombok.Data;
 
@@ -13,4 +14,9 @@ public class UserResponse {
     private String phoneNumber;
     private boolean isTwoFactorEnabled;
 
+    /** JWT {@code role} claim ile uyumlu rol kodu (örn. USER). */
+    private String roleCode;
+
+    /** JWT {@code authorities} claim ile uyumlu yetki kodları. */
+    private List<String> authorities;
 }

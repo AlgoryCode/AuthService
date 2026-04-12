@@ -1,8 +1,10 @@
 package com.ael.authservice.factory;
 
 import com.ael.authservice.dto.request.AuthRequest;
-import com.ael.authservice.provider.AuthProvider;
+import com.ael.authservice.dto.request.RegisterRequest;
+import com.ael.authservice.dto.response.UserResponse;
 import com.ael.authservice.model.AuthType;
+import com.ael.authservice.provider.AuthProvider;
 import org.springframework.stereotype.Component;
 
 import java.util.EnumMap;
@@ -39,5 +41,23 @@ public class AuthProviderFactory {
         }
 
         return typedProvider;
+    }
+
+    public UserResponse register(AuthType type, RegisterRequest request) {
+        AuthProvider<?> provider = providers.get(type);
+        if (provider == null || !provider.supportsRegistration()) {
+            throw new IllegalArgumentException("Registration not supported for: " + type);
+        }
+        Class<?> expected = provider.registrationRequestType();
+        if (expected == null || !expected.isInstance(request)) {
+            throw new IllegalArgumentException(
+                    "Registration request type mismatch for "
+                            + type
+                            + ". Expected: "
+                            + (expected == null ? "?" : expected.getSimpleName())
+                            + ", actual: "
+                            + request.getClass().getSimpleName());
+        }
+        return provider.register(request);
     }
 }

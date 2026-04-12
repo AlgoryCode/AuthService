@@ -1,12 +1,14 @@
 package com.ael.authservice.controller;
 
 import com.ael.authservice.dto.request.GoogleAuthRequest;
+import com.ael.authservice.dto.request.GoogleRegisterRequest;
 import com.ael.authservice.dto.response.TokenResponse;
 import com.ael.authservice.dto.response.UserResponse;
 import com.ael.authservice.model.AuthType;
 import com.ael.authservice.service.AuthService;
 import com.ael.authservice.service.TokenService;
 import com.ael.authservice.util.JwtUtil;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -46,7 +48,7 @@ public class GoogleAuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<?> googleRegister(@RequestBody GoogleAuthRequest request) {
-        return ResponseEntity.ok("");
+    public ResponseEntity<UserResponse> googleRegister(@Valid @RequestBody GoogleRegisterRequest request) {
+        return ResponseEntity.ok(authService.register(AuthType.GOOGLE, request));
     }
 }

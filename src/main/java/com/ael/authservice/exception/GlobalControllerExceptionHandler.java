@@ -58,6 +58,17 @@ public class GlobalControllerExceptionHandler extends RuntimeException {
      * ResponseStatusException'ı gerçek HTTP koduyla döndürür.
      * Aksi halde {@link #handleGenericException} yakalayıp 500 yapıyordu (örn. yanlış TOTP → 401 yerine 500).
      */
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<ErrorResponse> handleIllegalArgument(IllegalArgumentException ex) {
+        log.warn("Bad request: {}", ex.getMessage());
+        ErrorResponse errorResponse = new ErrorResponse(
+                ex.getClass().getSimpleName(),
+                System.currentTimeMillis(),
+                Collections.singletonList(ex.getMessage()),
+                Collections.emptyMap());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResponse);
+    }
+
     @ExceptionHandler(ResponseStatusException.class)
     public ResponseEntity<ErrorResponse> handleResponseStatus(ResponseStatusException ex) {
         int statusCode = ex.getStatusCode().value();

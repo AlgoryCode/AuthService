@@ -79,7 +79,8 @@ public class TokenService {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Refresh token expired");
         }
 
-        User user = userRepository.findById(tokenLog.getUserId())
+        User user = userRepository
+                .findByIdWithRoleAndAuthorities(tokenLog.getUserId())
                 .orElseThrow(() -> new RuntimeException("Invalid credentials"));
 
         String uuid = UUID.randomUUID().toString();

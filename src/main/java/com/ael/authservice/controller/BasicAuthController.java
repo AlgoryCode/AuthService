@@ -1,15 +1,14 @@
 package com.ael.authservice.controller;
 
 import com.ael.authservice.dto.request.BasicAuthRequest;
+import com.ael.authservice.dto.request.BasicRegisterRequest;
 import com.ael.authservice.dto.request.GoogleAuthRequest;
 import com.ael.authservice.dto.response.RefreshTokenResponse;
 import com.ael.authservice.dto.response.TokenResponse;
 import com.ael.authservice.dto.response.UserResponse;
-import com.ael.authservice.model.User;
-import com.ael.authservice.service.AuthService;
 import com.ael.authservice.model.AuthType;
+import com.ael.authservice.service.AuthService;
 import com.ael.authservice.service.TokenService;
-import com.ael.authservice.service.UserService;
 import com.ael.authservice.util.JwtUtil;
 import com.ael.authservice.model.LoginRequest;
 import jakarta.validation.Valid;
@@ -36,7 +35,6 @@ public class BasicAuthController {
     private final JwtUtil jwtUtil;
     private final TokenService tokenService;
     private final AuthService authService;
-    private final UserService userService;
 
 
     @PostMapping("/login")
@@ -70,8 +68,8 @@ public class BasicAuthController {
     }
 
     @PostMapping("/register")
-    public ResponseEntity<?> register(@Valid @RequestBody User user) {
-        userService.createUser(user);
+    public ResponseEntity<?> register(@Valid @RequestBody BasicRegisterRequest request) {
+        authService.register(AuthType.BASIC, request);
         return ResponseEntity.ok("User Created Successfully");
     }
 

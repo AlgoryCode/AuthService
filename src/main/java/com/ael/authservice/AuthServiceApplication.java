@@ -1,12 +1,13 @@
 package com.ael.authservice;
 
+import com.ael.authservice.config.properties.RbacAppProperties;
 import com.ael.authservice.config.rabbitmq.MailOutboundProperties;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 
 @SpringBootApplication
-@EnableConfigurationProperties(MailOutboundProperties.class)
+@EnableConfigurationProperties({MailOutboundProperties.class, RbacAppProperties.class})
 public class AuthServiceApplication {
 
     public static void main(String[] args) {

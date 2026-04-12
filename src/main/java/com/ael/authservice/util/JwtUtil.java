@@ -20,8 +20,10 @@ import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.util.Base64;
 import javax.crypto.SecretKey;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.function.Function;
@@ -66,11 +68,16 @@ public class JwtUtil {
         Map<String, Object> claims = new HashMap<>();
         claims.put("jti", jti);
         claims.put("session_id",sessionId);
-        //claims.put("role", user.getRoles());
         claims.put("userId", user.getUserId());
         claims.put("firstName", user.getFirstName());
         claims.put("lastName", user.getFamilyName());
         claims.put("tokenType", "ACCESS_TOKEN");
+        if (user.getRoleCode() != null && !user.getRoleCode().isBlank()) {
+            claims.put("role", user.getRoleCode());
+        }
+        if (user.getAuthorities() != null && !user.getAuthorities().isEmpty()) {
+            claims.put("authorities", user.getAuthorities());
+        }
         return createAccessToken(claims, user.getUserId().toString());
     }
 
@@ -176,6 +183,25 @@ public class JwtUtil {
 
     public String extractRole(String token) {
         return extractClaim(token, claims -> claims.get("role", String.class));
+    }
+
+    /** Access token içindeki {@code authorities} listesini döndürür (yoksa boş liste). */
+    public List<String> extractAuthorities(String token) {
+        Object raw = extractClaim(token, claims -> claims.get("authorities"));
+        if (raw == null) {
+            return List.of();
+        }
+        if (raw instanceof List<?> list) {
+            List<String> out = new ArrayList<>(list.size());
+            for (Object o : list) {
+                out.add(String.valueOf(o));
+            }
+            return List.copyOf(out);
+        }
+        if (raw instanceof String s && !s.isBlank()) {
+            return List.of(s);
+        }
+        return List.of();
     }
 
     public Integer extractUserId(String token) {

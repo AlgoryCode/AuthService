@@ -1,9 +1,11 @@
 package com.ael.authservice.service;
 
 import com.ael.authservice.dto.request.MyProfilePatchRequest;
+import com.ael.authservice.dto.request.RegistrationRole;
 import com.ael.authservice.dto.response.MyProfileResponse;
 import com.ael.authservice.dto.response.UserResponse;
 import com.ael.authservice.mapper.UserMapper;
+import com.ael.authservice.model.Role;
 import com.ael.authservice.model.User;
 import com.ael.authservice.repository.UserRepository;
 import java.time.LocalDateTime;
@@ -21,18 +23,41 @@ public class UserService {
     private final UserRepository userRepository;
     private final UserMapper userMapper;
     private final PasswordEncoder passwordEncoder;
+    private final RegistrationRoleResolver registrationRoleResolver;
 
+    /** Google vb. otomatik ilk kayıt: varsayılan {@link RegistrationRole#USER}. */
+    @Transactional
     public UserResponse createUser(User user) {
+        return registerNewUser(user, RegistrationRole.USER);
+    }
+
+    /**
+     * Yeni kullanıcıyı şifre hashleyerek kaydeder ve {@link RegistrationRole} ile rol atar.
+     */
+    @Transactional
+    public UserResponse registerNewUser(User user, RegistrationRole registrationRole) {
         user.setPassword(passwordEncoder.encode(user.getPassword()));
+        user.setRole(null);
+        user.setRoles(null);
+        Role role = registrationRoleResolver.resolve(registrationRole);
+        user.setRole(role);
+        user.setRoles(role.getCode());
         return userMapper.toResponse(userRepository.save(user));
     }
 
+    public boolean existsByEmail(String email) {
+        return userRepository.existsByEmail(email);
+    }
+
     public Optional<UserResponse> findUserByEmail(String email) {
-        return userRepository.findByEmail(email).map(userMapper::toResponse);
+        return userRepository.findByEmailWithRoleAndAuthorities(email).map(userMapper::toResponse);
     }
 
     public UserResponse getUserById(Integer userId) {
-        return userMapper.toResponse(userRepository.findById(userId).get());
+        return userRepository
+                .findByIdWithRoleAndAuthorities(userId)
+                .map(userMapper::toResponse)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Kullanıcı bulunamadı"));
     }
 
     /** İlk açılışta created_at boşsa doldurulur (eski kayıtlar). */

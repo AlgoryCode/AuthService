@@ -6,7 +6,9 @@ import java.time.LocalDateTime;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Data
 @Builder
@@ -31,7 +33,14 @@ public class User {
     private String password;
     private boolean twoFactorEnabled;
     private String totpSecret;
+    /** Eski metin alanı (örn. USER); yeni akışta {@link #role} önceliklidir. */
     private String roles;
+
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "role_id")
+    private Role role;
 
     @Column(name = "created_at")
     private LocalDateTime createdAt;

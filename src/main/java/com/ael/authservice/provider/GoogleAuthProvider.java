@@ -1,11 +1,15 @@
 package com.ael.authservice.provider;
 
 import com.ael.authservice.dto.request.GoogleAuthRequest;
+import com.ael.authservice.dto.request.GoogleRegisterRequest;
+import com.ael.authservice.dto.request.RegisterRequest;
 import com.ael.authservice.dto.response.UserResponse;
 import com.ael.authservice.mapper.UserMapper;
 import com.ael.authservice.model.AuthType;
 import com.ael.authservice.model.User;
 import com.ael.authservice.service.UserService;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.server.ResponseStatusException;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken.Payload;
 import com.google.api.client.googleapis.auth.oauth2.GoogleIdTokenVerifier;
@@ -46,6 +50,28 @@ public class GoogleAuthProvider implements AuthProvider<GoogleAuthRequest> {
                     User newUser = userMapper.PayloadToUser(payload);
                     return userService.createUser(newUser);
                 });
+    }
+
+    @Override
+    public boolean supportsRegistration() {
+        return true;
+    }
+
+    @Override
+    public Class<? extends RegisterRequest> registrationRequestType() {
+        return GoogleRegisterRequest.class;
+    }
+
+    @Override
+    public UserResponse register(RegisterRequest request) {
+        GoogleRegisterRequest r = (GoogleRegisterRequest) request;
+        Payload payload = verify(r.idToken());
+        String email = payload.getEmail();
+        if (userService.existsByEmail(email)) {
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Bu e-posta zaten kayıtlı");
+        }
+        User newUser = userMapper.PayloadToUser(payload);
+        return userService.registerNewUser(newUser, r.registrationRole());
     }
 
     public Payload verify(String idTokenString) {

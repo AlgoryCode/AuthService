@@ -91,6 +91,21 @@ logging:
 
 
 app:
+  rbac:
+    # RENT/QR rolleri ve yetkileri ilk açılışta DB’ye idempotent eklenir. Yalnızca SQL kullanacaksanız false yapın.
+    rent-qr-seed-enabled: true
+    # basicauth/register isteğinde roleCode ile atanabilecek roller (USER/ADMIN burada olmamalı).
+    registration-allowed-role-codes:
+      - RENT_USER
+      - RENT_MANAGER
+      - RENT_ADMIN
+      - QR_USER
+      - QR_MANAGER
+      - QR_ADMIN
+  security:
+    admin-api:
+      # false: /admin/** JWT kontrolü yok (yalnızca yerel geliştirme); prod’da true bırakın.
+      protected: true
   mail:
     rabbit:
       exchange: algorycode.mail.exchange
