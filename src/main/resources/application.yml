@@ -24,8 +24,8 @@ spring:
               - email , profile , openid
     jwt:
       secret: "404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970"
-      expiration: 300000 # 5 dakika
-      refresh-expiration: 2592000000 # 7 gün
+      expiration: 7200000 # 2 saat (access)
+      refresh-expiration: 2592000000 # 30 gün (~1 ay, refresh)
       # Girişte 2FA beklenirken (şifre/Google sonrası) verilen geçici JWT ömrü
       two-factor-pending-expiration: 300000
 

@@ -26,6 +26,7 @@
 /home/tarik/Masaüstü/Services/AuthService/src/main/java/com/ael/authservice/dto/request/GoogleAuthRequest.java
 /home/tarik/Masaüstü/Services/AuthService/src/main/java/com/ael/authservice/dto/request/GoogleRegisterRequest.java
 /home/tarik/Masaüstü/Services/AuthService/src/main/java/com/ael/authservice/dto/request/MyProfilePatchRequest.java
+/home/tarik/Masaüstü/Services/AuthService/src/main/java/com/ael/authservice/dto/request/RefreshTokenBody.java
 /home/tarik/Masaüstü/Services/AuthService/src/main/java/com/ael/authservice/dto/request/RegisterRequest.java
 /home/tarik/Masaüstü/Services/AuthService/src/main/java/com/ael/authservice/dto/request/RegistrationRole.java
 /home/tarik/Masaüstü/Services/AuthService/src/main/java/com/ael/authservice/dto/request/TotpCodeRequest.java
