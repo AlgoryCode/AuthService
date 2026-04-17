@@ -61,6 +61,23 @@ public class JwtUtil {
         return data;
     }
 
+    /**
+     * Misafir kiralama: refresh yok; subject = {@code guestSessionId}.
+     * Claim {@code authorities} içinde {@code RENT_GUEST} (gateway / rent kurallarına göre).
+     */
+    public String generateGuestAccessToken(String normalizedEmail, String guestSessionId) {
+        String jti = UUID.randomUUID().toString();
+        Map<String, Object> claims = new HashMap<>();
+        claims.put("jti", jti);
+        claims.put("session_id", guestSessionId);
+        claims.put("tokenType", "ACCESS_TOKEN");
+        claims.put("guest", Boolean.TRUE);
+        claims.put("email", normalizedEmail);
+        claims.put("guestSessionId", guestSessionId);
+        claims.put("authorities", List.of("RENT_GUEST"));
+        return createAccessToken(claims, guestSessionId);
+    }
+
     public String generateAccessToken(UserResponse user,String uuid) {
         String jti = UUID.randomUUID().toString();
         String sessionId = UUID.randomUUID().toString();

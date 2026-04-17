@@ -9,6 +9,7 @@ import com.ael.authservice.model.Role;
 import com.ael.authservice.model.User;
 import com.ael.authservice.repository.UserRepository;
 import java.time.LocalDateTime;
+import java.util.Locale;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
@@ -47,6 +48,18 @@ public class UserService {
 
     public boolean existsByEmail(String email) {
         return userRepository.existsByEmail(email);
+    }
+
+    /**
+     * Kayıtlı kullanıcı e-postası var mı (büyük/küçük harf duyarsız).
+     * Misafir rezervasyon akışında kullanılır.
+     */
+    public boolean isEmailRegistered(String email) {
+        if (email == null || email.isBlank()) {
+            return false;
+        }
+        String normalized = email.trim().toLowerCase(Locale.ROOT);
+        return userRepository.existsByEmailIgnoreCase(normalized);
     }
 
     public Optional<UserResponse> findUserByEmail(String email) {
