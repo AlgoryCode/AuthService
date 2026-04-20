@@ -1,4 +1,4 @@
-package com.ael.authservice.controller.guest;
+package com.ael.authservice.controller;
 
 import com.ael.authservice.dto.guest.GuestAccessTokenRequest;
 import com.ael.authservice.dto.guest.GuestAccessTokenResponse;

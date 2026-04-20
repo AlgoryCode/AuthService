@@ -3,6 +3,7 @@ package com.ael.authservice.controller;
 import com.ael.authservice.dto.request.BasicAuthRequest;
 import com.ael.authservice.dto.request.BasicRegisterRequest;
 import com.ael.authservice.dto.request.EmailRegisteredCheckRequest;
+import com.ael.authservice.dto.request.RefreshTokenRequest;
 import com.ael.authservice.dto.response.EmailRegisteredCheckResponse;
 import com.ael.authservice.dto.response.TokenResponse;
 import com.ael.authservice.dto.response.UserResponse;
@@ -20,7 +21,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RefreshScope
-@RequestMapping("/basicauth")
+@RequestMapping({"/basicauth", "/authservice/basicauth"})
 @AllArgsConstructor
 public class BasicAuthController {
 
@@ -65,8 +66,8 @@ public class BasicAuthController {
 
 
     @PostMapping("/logout")
-    public ResponseEntity<?> logout(@CookieValue String refresh_token) {
-        tokenService.revokeToken(refresh_token);
+    public ResponseEntity<?> logout(@Valid @RequestBody RefreshTokenRequest body) {
+        tokenService.revokeToken(body.refreshToken());
         return ResponseEntity.ok().body("Logout out");
     }
 
@@ -77,13 +78,13 @@ public class BasicAuthController {
     }
 
     @PostMapping("/refreshToken")
-    public ResponseEntity<?> refreshAccessToken(@CookieValue String refreshToken) {
-        return tokenService.refreshToken(refreshToken);
+    public ResponseEntity<?> refreshAccessToken(@Valid @RequestBody RefreshTokenRequest body) {
+        return tokenService.refreshToken(body.refreshToken());
     }
 
     @PostMapping("/revoke-refreshtoken")
-    public ResponseEntity<String> revokeRefreshToken(@CookieValue String refresh_token) {
-        tokenService.revokeToken(refresh_token);
+    public ResponseEntity<String> revokeRefreshToken(@Valid @RequestBody RefreshTokenRequest body) {
+        tokenService.revokeToken(body.refreshToken());
         return ResponseEntity.ok("Refresh token revoked");
     }
 

@@ -10,14 +10,11 @@ import com.ael.authservice.repository.TokenLogRepository;
 import com.ael.authservice.repository.UserRepository;
 import com.ael.authservice.util.JwtUtil;
 import lombok.RequiredArgsConstructor;
-import org.springframework.cglib.core.Local;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.UUID;
 
 @Service
@@ -56,19 +53,29 @@ public class TokenService {
     }
 
     public void revokeToken(String refreshToken) {
-
-        TokenLog tokenLog = tokenLogRepository.findBySessionId(jwtUtil.extractSessionIdFromToken(refreshToken));
-
+        String sessionId = jwtUtil.extractSessionIdFromToken(refreshToken);
+        if (sessionId == null || sessionId.isBlank()) {
+            return;
+        }
+        TokenLog tokenLog = tokenLogRepository.findBySessionId(sessionId);
+        if (tokenLog == null) {
+            return;
+        }
         tokenLog.setRevokedAt(LocalDateTime.now());
         tokenLog.setRevoked(true);
-
         tokenLogRepository.save(tokenLog);
     }
 
     public ResponseEntity<?> refreshToken(String reToken) {
 
         String sessionId = jwtUtil.extractSessionIdFromToken(reToken);
+        if (sessionId == null || sessionId.isBlank()) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid refresh token");
+        }
         TokenLog tokenLog = tokenLogRepository.findBySessionId(sessionId);
+        if (tokenLog == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Unknown refresh session");
+        }
 
         if (tokenLog.getExpiryDate().isBefore(LocalDateTime.now()) || tokenLog.isRevoked()){
             if(!tokenLog.isRevoked()){
