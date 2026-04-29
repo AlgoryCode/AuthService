@@ -33,24 +33,11 @@ spring:
     restart:
       enabled: true
   datasource:
-    url: jdbc:mysql://195.85.207.153:3306/algorycodedb
-    username: algorycode
+    url: jdbc:postgresql://195.85.207.153:5432/algorycodedb
+    username: postgres
     password: algorycode1.
-    driver-class-name: com.mysql.cj.jdbc.Driver
-    hikari:
-      pool-name: AuthServiceHikariPool
-      minimum-idle: 2
-      maximum-pool-size: 10
-      connection-timeout: 30000
-      validation-timeout: 5000
-      initialization-fail-timeout: 60000
-      max-lifetime: 1800000
-      idle-timeout: 600000
-      keepalive-time: 300000
-      leak-detection-threshold: 0
-      connection-test-query: SELECT 1
+    driver-class-name: org.postgresql.Driver
   jpa:
-    database-platform: org.hibernate.dialect.MySQLDialect
     show-sql: true
     hibernate:
       ddl-auto: update
