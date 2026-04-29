@@ -33,7 +33,7 @@ spring:
     restart:
       enabled: true
   datasource:
-    url: jdbc:mysql://45.147.47.129:3306/algorycodedb
+    url: jdbc:mysql://195.85.207.153:3306/algorycodedb
     username: algorycode
     password: algorycode1.
     driver-class-name: com.mysql.cj.jdbc.Driver
