@@ -13,8 +13,8 @@ public interface UserOtpRepository extends JpaRepository<UserOtp,Long> {
 
     @Modifying
     @Transactional
-    @Query("UPDATE UserOtp usr SET usr.usage = true " +
-            "WHERE usr.userId = :userId AND usr.usage = false")
+    @Query("UPDATE UserOtp usr SET usr.isUsed = true " +
+            "WHERE usr.userId = :userId AND usr.isUsed = false")
     void deactivateOldOtp(@Param("userId") Long userId);
 
     List<UserOtp> findUserOtpByCode(String code);

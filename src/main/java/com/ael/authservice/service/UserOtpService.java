@@ -34,7 +34,7 @@ public class UserOtpService {
     }
 
     public boolean isValidOtp(String code) {
-        return otpPasswordChangeRepository.findOtpPasswordChangeByCode(code).getUsage();
+        return otpPasswordChangeRepository.findOtpPasswordChangeByCode(code).getIsUsed();
     }
 
     public String generateOtp(String email) {

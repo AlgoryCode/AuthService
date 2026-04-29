@@ -32,7 +32,8 @@ public class UserOtp {
     @UpdateTimestamp
     private LocalDateTime updatedAt;
 
-    private Boolean usage;
+    @Column(name = "is_used")
+    private Boolean isUsed;
 
 
 }
